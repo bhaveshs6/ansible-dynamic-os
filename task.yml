@@ -1,0 +1,21 @@
+- hosts: webservers
+  become: yes
+  vars_files:
+          - "var_files/{{ ansible_distribution }}.yml"
+  tasks:
+          - name: Install WebServer
+            package:
+                    name: "{{ package }}"
+                    state: present
+            notify: Restart service
+          - name: Add files to root directory
+            copy:
+                    content: "This is coming from {{ package }} from {{ ansible_distribution }}"
+                    dest: /var/www/html/index.html
+            notify: Restart service
+  handlers:
+          - name: Restart service
+            service:
+                    name: "{{ package }}"
+                    state: started
+                    enabled: yes
